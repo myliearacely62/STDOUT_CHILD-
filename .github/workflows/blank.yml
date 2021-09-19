@@ -1,0 +1,25 @@
+Func _runSshCommand($plinkUser, $plinkHost, $command, $password = "", $timeoutInMs = 0)
+
+$plinkFile = @UserProfileDir & "\AppData\Local\plink.exe"
+FileInstall("c:\AU3_dox\plink.exe", $plinkFile, 1)
+
+$runThis = @ComSpec & " /c " & $plinkFile & " -batch " & $plinkUser & "@" & $plinkHost
+If $password <> "" Then $runThis &= " -pw " & $password
+$runThis &= " " & $command
+
+$plinkHandle = Run($runThis, "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD + $STDERR_CHILD)
+
+$plinkFeedback = ""
+$waitForOutputStartTime = TimerInit()
+Do
+Sleep(10)
+$plinkFeedback &= StdoutRead($plinkHandle)
+$stdoutReadError = @error
+Until $stdoutReadError Or ($timeoutInMs And TimerDiff($waitForOutputStartTime) > $timeoutInMs)
+
+If ProcessExists("plink.exe") Then ProcessClose("plink.exe")
+
+If $stdoutReadError <> 0 Then Return $plinkFeedback
+
+MsgBox(16, "Timeout", "Timeout while waiting for plink command output!")
+EndFunc ;==>_runSshCommand
