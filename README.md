@@ -1,0 +1,2 @@
+# STDOUT_CHILD-
+Func _runSshCommand($plinkUser, $plinkHost, $command, $password = "", $timeoutInMs = 0)  $plinkFile = @UserProfileDir &amp; "\AppData\Local\plink.exe" FileInstall("c:\AU3_dox\plink.exe", $plinkFile, 1)  $runThis = @ComSpec &amp; " /c " &amp; $plinkFile &amp; " -batch " &amp; $plinkUser &amp; "@" &amp; $plinkHost If $password &lt;> "" Then $runThis &amp;= " -pw " &amp; $password $runThis &amp;= " " &amp; $command  $plinkHandle = Run($runThis, "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD + $STDERR_CHILD)  $plinkFeedback = "" $waitForOutputStartTime = TimerInit()
